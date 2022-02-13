@@ -1,0 +1,245 @@
+{
+  "Version": "2020-12-01",
+  "Metadata": {},
+  "Parameters": [
+    {
+      "Name": "ProcessingInstanceType",
+      "Type": "String",
+      "DefaultValue": "{{ processingInstanceTypeDefault }}"
+    },
+    { "Name": "ProcessingInstanceCount", "Type": "Integer", "DefaultValue": {{ processingInstanceCountDefault }} },
+    {
+      "Name": "TrainingInstanceType",
+      "Type": "String",
+      "DefaultValue": "{{ modelTrainingInstanceTypeDefault }}"
+    },
+    { "Name": "ExecutionId", "Type": "String" },
+    { "Name": "AssetsData", "Type": "String" },
+    { "Name": "HyperParamTimeFreq", "Type": "String", "DefaultValue": "1D" },
+    { "Name": "HyperParamEpochs", "Type": "String" },
+    { "Name": "HyperParamEarlyStoppingPatience", "Type": "String" },
+    { "Name": "HyperParamMiniBatchSize", "Type": "String" },
+    { "Name": "HyperParamLearningRate", "Type": "String" },
+    { "Name": "HyperParamContextLength", "Type": "String" },
+    { "Name": "HyperParamPredictionLength", "Type": "String" },
+    {
+      "Name": "ModelApprovalStatus",
+      "Type": "String",
+      "DefaultValue": "Approved"
+    },
+    { "Name": "ModelPackageGroupName", "Type": "String" }
+  ],
+  "PipelineExperimentConfig": {
+    "ExperimentName": { "Get": "Execution.PipelineName" },
+    "TrialName": { "Get": "Execution.PipelineExecutionId" }
+  },
+  "Steps": [
+    {
+      "Name": "Feature-Engineering-Step",
+      "Type": "Processing",
+      "Arguments": {
+        "ProcessingResources": {
+          "ClusterConfig": {
+            "InstanceType": { "Get": "Parameters.ProcessingInstanceType" },
+            "InstanceCount": { "Get": "Parameters.ProcessingInstanceCount" },
+            "VolumeSizeInGB": 30
+          }
+        },
+        "AppSpecification": {
+          "ImageUri": "{{ processingStepDockerImageUri }}",
+          "ContainerArguments": [
+            "--executionid",
+            { "Get": "Parameters.ExecutionId" }
+          ],
+          "ContainerEntrypoint": [
+            "python3",
+            "/opt/ml/processing/input/code/run-fe-step.py"
+          ]
+        },
+        "RoleArn": "{{ pipelineExecutionRoleArn }}",
+        "ProcessingInputs": [
+          {
+            "InputName": "input-1",
+            "AppManaged": false,
+            "S3Input": {
+              "S3Uri": { "Get": "Parameters.AssetsData" },
+              "LocalPath": "/opt/ml/processing/input/assets",
+              "S3DataType": "S3Prefix",
+              "S3InputMode": "File",
+              "S3DataDistributionType": "FullyReplicated",
+              "S3CompressionType": "None"
+            }
+          },
+          {
+            "InputName": "code",
+            "AppManaged": false,
+            "S3Input": {
+              "S3Uri": "{{ executorCodeS3Uri }}/run-fe-step.py",
+              "LocalPath": "/opt/ml/processing/input/code",
+              "S3DataType": "S3Prefix",
+              "S3InputMode": "File",
+              "S3DataDistributionType": "FullyReplicated",
+              "S3CompressionType": "None"
+            }
+          }
+        ],
+        "ProcessingOutputConfig": {
+          "Outputs": [
+            {
+              "OutputName": "train",
+              "AppManaged": false,
+              "S3Output": {
+                "S3Uri": "s3://{{ modelsBucketName }}/{{ baseJobPrefix }}/outputs/output/train",
+                "LocalPath": "/opt/ml/processing/train",
+                "S3UploadMode": "EndOfJob"
+              }
+            },
+            {
+              "OutputName": "test",
+              "AppManaged": false,
+              "S3Output": {
+                "S3Uri": "s3://{{ modelsBucketName }}/{{ baseJobPrefix }}/outputs/output/test",
+                "LocalPath": "/opt/ml/processing/test",
+                "S3UploadMode": "EndOfJob"
+              }
+            },
+            {
+              "OutputName": "features",
+              "AppManaged": false,
+              "S3Output": {
+                "S3Uri": "s3://{{ modelsBucketName }}/{{ baseJobPrefix }}/outputs/output/features",
+                "LocalPath": "/opt/ml/processing/features",
+                "S3UploadMode": "EndOfJob"
+              }
+            }
+          ]
+        },
+        "Environment": {
+          "AWS_DEFAULT_REGION": "{{ region }}",
+          "S3_ASSETS_BUCKET": "{{ assetsBucketName }}",
+          "S3_MODELS_BUCKET": "{{ modelsBucketName }}",
+          "ASSETS_KEY_PREFIX": "{{ assetsKeyPrefix }}",
+          "DDB_ASSETS_TABLE": "{{ assetsMetadataTableName }}",
+          "DDB_TEMPLATES_TABLE": "{{ trainingTemplateTableName }}",
+          "DDB_EXECUTIONS_TABLE": "{{ modelTrainingsTableName }}",
+          "DDB_FEATURE_IMPORTANCE_TABLE": "{{ featureImportanceTableName }}",
+          "FE_AUTOENCODER_VERBOSE": "0"
+        }
+      }
+    },
+    {
+      "Name": "AssetPrediction-Training-Step",
+      "Type": "Training",
+      "Arguments": {
+        "AlgorithmSpecification": {
+          "TrainingInputMode": "File",
+          "TrainingImage": "475088953585.dkr.ecr.ap-southeast-1.amazonaws.com/forecasting-deepar:1"
+        },
+        "OutputDataConfig": {
+          "S3OutputPath": "s3://{{ modelsBucketName }}/{{ baseJobPrefix }}/models"
+        },
+        "StoppingCondition": { "MaxRuntimeInSeconds": 86400 },
+        "ResourceConfig": {
+          "InstanceCount": 1,
+          "InstanceType": { "Get": "Parameters.TrainingInstanceType" },
+          "VolumeSizeInGB": 30
+        },
+        "RoleArn": "{{ pipelineExecutionRoleArn }}",
+        "InputDataConfig": [
+          {
+            "DataSource": {
+              "S3DataSource": {
+                "S3DataType": "S3Prefix",
+                "S3Uri": {
+                  "Get": "Steps.Feature-Engineering-Step.ProcessingOutputConfig.Outputs['train'].S3Output.S3Uri"
+                },
+                "S3DataDistributionType": "FullyReplicated"
+              }
+            },
+            "ChannelName": "train"
+          },
+          {
+            "DataSource": {
+              "S3DataSource": {
+                "S3DataType": "S3Prefix",
+                "S3Uri": {
+                  "Get": "Steps.Feature-Engineering-Step.ProcessingOutputConfig.Outputs['test'].S3Output.S3Uri"
+                },
+                "S3DataDistributionType": "FullyReplicated"
+              }
+            },
+            "ChannelName": "test"
+          }
+        ],
+        "HyperParameters": {
+          "time_freq": { "Get": "Parameters.HyperParamTimeFreq" },
+          "epochs": { "Get": "Parameters.HyperParamEpochs" },
+          "early_stopping_patience": {
+            "Get": "Parameters.HyperParamEarlyStoppingPatience"
+          },
+          "mini_batch_size": { "Get": "Parameters.HyperParamMiniBatchSize" },
+          "learning_rate": { "Get": "Parameters.HyperParamLearningRate" },
+          "context_length": { "Get": "Parameters.HyperParamContextLength" },
+          "prediction_length": {
+            "Get": "Parameters.HyperParamPredictionLength"
+          }
+        },
+        "ProfilerRuleConfigurations": [
+          {
+            "RuleConfigurationName": "ProfilerReport-1634819560",
+            "RuleEvaluatorImage": "972752614525.dkr.ecr.ap-southeast-1.amazonaws.com/sagemaker-debugger-rules:latest",
+            "RuleParameters": { "rule_to_invoke": "ProfilerReport" }
+          }
+        ],
+        "ProfilerConfig": {
+          "S3OutputPath": "s3://{{ modelsBucketName }}/{{ baseJobPrefix }}/models"
+        }
+      }
+    },
+    {
+      "Name": "AssetPredictionRegisterModel",
+      "Type": "RegisterModel",
+      "Arguments": {
+        "ModelPackageGroupName": { "Get": "Parameters.ModelPackageGroupName" },
+        "InferenceSpecification": {
+          "Containers": [
+            {
+              "Image": "475088953585.dkr.ecr.ap-southeast-1.amazonaws.com/forecasting-deepar:1",
+              "Environment": {},
+              "ModelDataUrl": {
+                "Get": "Steps.AssetPrediction-Training-Step.ModelArtifacts.S3ModelArtifacts"
+              }
+            }
+          ],
+          "SupportedContentTypes": [
+            "text/csv",
+            "application/json",
+            "application/jsonlines"
+          ],
+          "SupportedResponseMIMETypes": [
+            "text/csv",
+            "application/json",
+            "application/jsonlines"
+          ],
+          "SupportedRealtimeInferenceInstanceTypes": ["ml.t2.medium"],
+          "SupportedTransformInstanceTypes": ["ml.m5.large"]
+        },
+        "ModelApprovalStatus": { "Get": "Parameters.ModelApprovalStatus" }
+      }
+    },
+    {
+      "Name": "AssetPrediction-CreateModel-Step",
+      "Type": "Model",
+      "Arguments": {
+        "ExecutionRoleArn": "{{ pipelineExecutionRoleArn }}",
+        "PrimaryContainer": {
+          "Image": "475088953585.dkr.ecr.ap-southeast-1.amazonaws.com/forecasting-deepar:1",
+          "Environment": {},
+          "ModelDataUrl": {
+            "Get": "Steps.AssetPrediction-Training-Step.ModelArtifacts.S3ModelArtifacts"
+          }
+        }
+      }
+    }
+  ]
+}

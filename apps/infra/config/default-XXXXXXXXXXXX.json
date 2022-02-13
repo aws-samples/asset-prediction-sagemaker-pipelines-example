@@ -1,0 +1,13 @@
+{
+  "env": {
+    "account": "XXXXXXXXXXXX",
+    "region": "ap-southeast-1"
+  },
+  "namespace": "apspe",
+  "administratorEmail": "your-email@your-domain.com",
+  "assetsBucketCsvKeyPrefix": "assets/csv",
+  "modelTrainingsPipelineExecIndexName": "pipelineExecutionArn-Index",
+  "modelEndpointArnIndexName": "modelEndpointArn-Index",
+  "modelEndpointExpiryTimeInMins": 60,
+  "modelEndpointCleanupSchedule": "rate(10 minutes)"
+}

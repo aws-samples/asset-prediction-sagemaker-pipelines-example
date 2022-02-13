@@ -1,0 +1,25 @@
+FROM tensorflow/tensorflow:2.6.0-jupyter
+
+RUN pip3 install --no-cache-dir \
+    awscli \
+    boto3 \
+    jsonpickle \
+    matplotlib \
+    numpy \
+    pandas \
+    sagemaker \
+    simplejson \
+    sklearn \
+    statsmodels \
+    ta \
+    xgboost
+
+ENV PYTHONUNBUFFERED=TRUE
+
+# WORKDIR /opt/ml/processing/input/code
+WORKDIR /app
+
+ADD ./lib ./lib
+ADD ./step_feature_engineering.py ./
+
+ENTRYPOINT ["python3"]

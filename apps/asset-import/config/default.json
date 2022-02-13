@@ -1,0 +1,9 @@
+{
+  "assetsDir": "<PATH_TO_DIR_CONTAINING_ASSET_CSVs>",
+  "classfile": "<ASSETCLASSES_FILE>",
+  "profile": "<AWS_PROFILE>",
+  "region": "<AWS_REGION>",
+  "bucket": "<S3_BUCKETNAME>",
+  "bucketKeyPrefix": "<BUCKET_PREFIX_FOR_ASSETS>",
+  "assetsDDBTableName": "<YOUR_ASSET_METADATA_DDB_TABLE_NAME>"
+}

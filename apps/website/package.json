@@ -1,0 +1,78 @@
+{
+  "name": "@apps/website",
+  "version": "1.0.0",
+  "description": "AWS ASset Prediction Sagemaker Pipelines Example - Web App",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aws-samples/asset-prediction-sagemaker-pipelines-example"
+  },
+  "author": "Amazon Web Services - ASEAN Prototyping <aws-asean-sa-prototyping@amazon.com>",
+  "contributors": [
+    "Greg Varga <gergelyv@amazon.com>"
+  ],
+  "license": "MIT-0",
+  "private": true,
+  "dependencies": {
+    "@aws-amplify/auth": "^4.3.0",
+    "@aws-amplify/ui-react": "^1.2.10",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^16.7.1",
+    "@types/react": "^17.0.19",
+    "@types/react-dom": "^17.0.9",
+    "amazon-cognito-identity-js": "^5.2.3",
+    "aws-amplify": "^4.2.4",
+    "aws-northstar": "^1.3.12",
+    "axios": "^0.25.0",
+    "chart.js": "^3.5.1",
+    "dayjs": "^1.10.7",
+    "immer": "^9.0.12",
+    "kaktana-react-lightweight-charts": "^2.0.0",
+    "react": "^17.0.2",
+    "react-chartjs-2": "^3.1.1",
+    "react-dom": "^17.0.2",
+    "react-dropzone": "^11.3.5",
+    "react-dropzone-uploader": "^2.11.0",
+    "react-image-gallery": "^1.2.7",
+    "react-intl": "^5.20.13",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "4.0.3",
+    "typescript": "^4.5.5",
+    "use-immer": "^0.6.0",
+    "uuid": "^8.3.2",
+    "web-vitals": "^1.0.1"
+  },
+  "scripts": {
+    "start": "SKIP_PREFLIGHT_CHECK=true react-scripts start",
+    "build": "SKIP_PREFLIGHT_CHECK=true react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.178",
+    "@types/react-image-gallery": "^1.0.5",
+    "@types/react-router-dom": "^5.1.8",
+    "@config/eslint": "0.0.1",
+    "prettier": "^2.5.1"
+  }
+}

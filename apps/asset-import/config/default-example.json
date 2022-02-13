@@ -1,0 +1,9 @@
+{
+  "assetsDir": "./downloader/dow-assets/tickers",
+  "classfile": "./downloader/dow-assets/asset-classes.csv",
+  "profile": "apspe",
+  "region": "ap-southeast-1",
+  "bucket": "apspe-assets-MY_AWS_ACCOUNT_ID-ap-southeast-1",
+  "bucketKeyPrefix": "assets/csv",
+  "assetsDDBTableName": "apspe-asset-metadata"
+}
