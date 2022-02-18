@@ -25,7 +25,7 @@ This project also showcases the implementation of the following major components
 
 * [Quickstart guide](./docs/quickstart.md)
 * [Documentation](./docs/README.md)
-* [Screenshots](./docs/screenshots.md)
+* [Screenshots](./docs/content/screenshots.md)
 
 
 ## Folder structure
