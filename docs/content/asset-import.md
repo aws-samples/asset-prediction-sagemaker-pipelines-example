@@ -16,7 +16,7 @@ To run it, create a virtual environemnt and install `yfinance` and `pandas` pack
 
 ## Importer
 
-The importer (`apps/asset-import`) is a simple `ts` script that will take the CSV files that contain the necessary data (refer to [asset data docs](./asset-data) on format).
+The importer (`apps/asset-import`) is a simple `ts` script that will take the CSV files that contain the necessary data (refer to [asset data docs](./asset-data.md) on format).
 
 Make sure you have review the config (`apps/asset-import/config/default.json`) and update if necessary.
 
