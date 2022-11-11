@@ -54,15 +54,20 @@
     "shell-quote": "^1.7.3",
     "ejs": "^3.1.7",
     "minimist": "^1.2.6",
-    "immer": "^9.0.6"
+    "immer": "^9.0.6",
+    "@types/react": "^17.0.2"
   },
   "dependencies": {
+    "@typescript-eslint/typescript-estree": "^5.10.0",
     "aws-cdk-lib": "^2.0.0",
     "cdk-constants": "^3.0.3",
     "cdk-iam-actions": "^1.0.0",
     "constructs": "^10.0.0",
     "find-up": "^5.0.0",
-    "lodash": "^4.17.21"
+    "immer": "^9.0.6",
+    "lodash": "^4.17.21",
+    "minimist": "^1.2.6",
+    "shell-quote": "^1.7.3"
   },
   "devDependencies": {
     "@types/jest": "^27.0.3",

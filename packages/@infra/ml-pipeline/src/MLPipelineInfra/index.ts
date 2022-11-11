@@ -308,10 +308,8 @@ export class MlPipeline extends Construct {
     const modelEndpointCleanupRule = new events.Rule(this, 'ModelEndpointCleanupRule', {
       ruleName: namespaced(this, 'ModelEndpointCleanup'),
       description: 'Model Endpoint Auto Cleanup',
-      schedule: {
-        expressionString: modelEndpointCleanupSchedule,
-      },
       targets: [new eventsTargets.LambdaFunction(modelEndpointCleanupLambda)],
+      schedule: events.Schedule.expression(modelEndpointCleanupSchedule),
     })
   }
 }
