@@ -69,10 +69,10 @@
     ]
   },
   "devDependencies": {
+    "@config/eslint": "0.0.1",
     "@types/lodash": "^4.14.178",
     "@types/react-image-gallery": "^1.0.5",
     "@types/react-router-dom": "^5.1.8",
-    "@config/eslint": "0.0.1",
     "prettier": "^2.5.1"
   }
 }
