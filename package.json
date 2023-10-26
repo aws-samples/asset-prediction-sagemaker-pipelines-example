@@ -1,5 +1,5 @@
 {
-  "name": "asset-prediction-sagemaker-pipelines-example",
+  "name": "@aws-samples/asset-prediction-sagemaker-pipelines-example",
   "version": "1.0.0",
   "description": "AWS Asset Prediction Sagemaker Pipelines Examples",
   "repository": {
